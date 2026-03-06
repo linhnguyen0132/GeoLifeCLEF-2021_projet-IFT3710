@@ -140,9 +140,7 @@ def main():
     history = train_and_evaluate(model, train_loader, val_loader, criterion, optimizer, num_epochs)
     print(f"\n Entraînement terminé en {(time.time() - start_total_time)/60:.1f} minutes.")
 
-    # ==========================================
-    # 7. SAUVEGARDE ET GRAPHIQUES
-    # ==========================================
+
     torch.save(model.state_dict(), MODELS_PATH / "resnet50_geolife.pth")
     print(" Modèle sauvegardé avec succès")
 
@@ -165,4 +163,5 @@ def main():
     print(" Graphique sauvegardé sous 'courbes_resnet50.png'")
 
 if __name__ == "__main__":
+
     main()
