@@ -8,7 +8,7 @@ import torch.nn as nn  # nn for neural network
 # bn : nous allons normaliser les valeurs pour rendre l'entraînement plus stable
 # dropout : probabilité de mettre des neurones égales à 0, pour éviter le sur-apprentissage
 class ConvBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size = 5, stride = 1, batch_norm = True, dropout = 0.2):
+    def __init__(self, in_channels, out_channels, kernel_size = 5, stride = 2, batch_norm = True, dropout = 0.2):
         super(ConvBlock, self).__init__()
         
         self.block = nn.Sequential(
@@ -23,11 +23,11 @@ class ConvBlock(nn.Module):
         
 class CNN(nn.Module):
     # Specify the number of classes for this task
-    def __init__(self, classes, strides = 1, kernel_size = 5, batch_norm = True, dropout = 0.2):
+    def __init__(self, classes, strides = 2, kernel_size = 5, batch_norm = True, dropout = 0.2):
         super().__init__()
 
         # Couche convolutionnelle
-        # Ajouter trois couches convolutionnelles pour retrouver le plus de caractéristiques
+        # Ajouter cinq couches convolutionnelles pour retrouver le plus de caractéristiques
         self.conv_layers = nn.Sequential(
             ConvBlock(4,32, stride = 1, dropout = 0.1),
             nn.MaxPool2d(2),
@@ -35,9 +35,9 @@ class CNN(nn.Module):
             nn.MaxPool2d(2),
             ConvBlock(64,128, stride = 1, dropout = 0.3),
             nn.MaxPool2d(2),
-            ConvBlock(128,256, stride = 1, dropout = 0.4),   # le modèle apprend 256 caractérisitiques
+            ConvBlock(128,256, stride = 1, dropout = 0.4),
     	    nn.MaxPool2d(2),
-            ConvBlock(256,512, stride = 1, dropout = 0.4)
+            ConvBlock(256,512, stride = 1, dropout = 0.5)
         )
 
         # Réduction spatiale
@@ -45,15 +45,15 @@ class CNN(nn.Module):
 
         # Partie fully-connected
         self.mlp = nn.Sequential(
-            nn.Linear(512 + 2,128),
+            nn.Linear(512 + 6,128),
             nn.ReLU(),
-            nn.Dropout(0.3),
+            nn.Dropout(0.4),
             #nn.Dropout(0.1),
             nn.Linear(128,64),
 
             #nn.Linear(512,64),
             nn.ReLU(),
-            nn.Dropout(0.3),
+            nn.Dropout(0.5),
     	    #nn.Dropout(0.2),
             nn.Linear(64, classes),
         )
