@@ -13,12 +13,14 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.utils.class_weight import compute_sample_weight
 import matplotlib.pyplot as plt
+
+# fonctions de la compétition
 from metrics import top_30_error_rate
 from metrics import top_k_error_rate
 from soumission import generate_submission_file
 
 from sklearn.impute import SimpleImputer
-print('XGBoost features - Données FR - 2021 - weighted sampling ')
+print('XGBoost features - Données FR - 2021 - weighted sampling - kMeans')
 
 #import cupy as cp
 path_2021 = "~/projects/def-sponsor00/geolifeclef/data"
@@ -89,12 +91,14 @@ print(f"Nouveau nombre de lignes : {len(df_reduced)}")
 #df_reduced.drop(columns=["latitude", "longitude"], inplace=True)
 #print('Nombre de clusters =  ' + str(nb_cluster))
 
+#coords_test = df_test_merged[["latitude", "longitude"]]
+#df_test_merged["coords"] = kmeans.predict(coords_test)
 
 # Polynomial features
 # On définit les colonnes numériques à nettoyer
 #bio_features = ['bldfie', 'bio_11', 'bio_1', 'bio_10']
 
-bio_features = ['bio_18', 'bio_7', 'bldfie', 'bio_5', 'phihox', 'bio_15', 'bio_10', 'longitude', 'bio_17', 'bio_9', 'latitude', 'bio_1', 'bio_6', 'bio_14', 'bio_11']
+bio_features = ['sndppt', 'sltppt', 'phihox', 'orcdrc', 'clyppt', 'cecsol', 'bldfie', 'bdticm', 'bio_19', 'bio_18', 'bio_17', 'bio_16', 'bio_15', 'bio_14', 'bio_13', 'bio_12', 'bio_11', 'bio_10', 'bio_9', 'bio_8', 'bio_7', 'bio_6', 'bio_5', 'bio_4', 'bio_3', 'bio_2', 'bio_1', 'latitude', 'longitude']
 
 print('list des features utilisées : ' + str(bio_features))
 
