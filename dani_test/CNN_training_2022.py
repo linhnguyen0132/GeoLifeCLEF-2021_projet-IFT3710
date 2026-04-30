@@ -22,10 +22,10 @@ SUBMISSION_PATH = Path("submissions")
 os.makedirs(SUBMISSION_PATH, exist_ok=True)
 
 # Hyper paramètres
-batch_size = 16
+batch_size = 32
 epochs = 15
 learning_rate = 0.00005
-decay = 0.001
+decay = 0.0001
 # create device based on GPU availability
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device:", device)
@@ -213,7 +213,7 @@ for epoch in range(epochs):
     print(f"Val Accuracy: {val_accuracy:.4f}")
     print(f"Val Top-30 Error: {val_top30_error:.4f}")
 
-torch.save(model.state_dict(), "cnn_model_11_2022.pth")
+torch.save(model.state_dict(), "cnn_model_final_2022.pth")
 print("Model saved!")
 
 # Sauvegarder les scores
@@ -228,7 +228,7 @@ results = pd.DataFrame({
 })
 
 
-results.to_csv(SUBMISSION_PATH / "training_scores_11_2022.csv", index=False)
+results.to_csv(SUBMISSION_PATH / "training_scores_final_2022.csv", index=False)
 print("Scores saved!")
 
 import matplotlib.pyplot as plt
@@ -242,7 +242,7 @@ plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.title("Training vs Validation Loss")
 plt.legend()
-plt.savefig(SUBMISSION_PATH / "training_curves_11_2022.png")
+plt.savefig(SUBMISSION_PATH / "training_curves_final_2022.png")
 plt.show()
 
 
@@ -255,5 +255,5 @@ plt.ylabel("Accuracy")
 plt.title("Validation Accuracy over Epochs")
 plt.legend()
 plt.show()
-plt.savefig(SUBMISSION_PATH / "accuracy_curve_11_2022.png")
+plt.savefig(SUBMISSION_PATH / "accuracy_curve_final_2022.png")
 print("Graph saved!")
