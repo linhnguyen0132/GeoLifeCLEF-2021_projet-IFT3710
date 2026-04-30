@@ -45,7 +45,7 @@ class CNN(nn.Module):
 
         # Partie fully-connected
         self.mlp = nn.Sequential(
-            nn.Linear(512 + 6,128),
+            nn.Linear(512 + 2,128),
             nn.ReLU(),
             nn.Dropout(0.4),
             #nn.Dropout(0.1),
@@ -66,3 +66,4 @@ class CNN(nn.Module):
         y = torch.cat([y, coords], dim=1)
         y = self.mlp(y)
         return y
+
