@@ -1,5 +1,5 @@
 from CNN import ConvBlock,CNN
-from  obs_and_patches import GeoLifeDataset
+from  obs_and_patches import GeoLifeDataset2
 
 import torch
 import torch.nn as nn
@@ -14,7 +14,7 @@ from PIL import Image
 
 # Change this path to adapt to where you downloaded the data
 BASE_PATH = Path("../..")
-DATA_PATH = BASE_PATH / "data"
+DATA_PATH = BASE_PATH / "/home/dani/projects/def-sponsor00/geolifeclef/data"
 
 # Create the path to save submission files
 SUBMISSION_PATH = Path("submissions")
@@ -22,8 +22,9 @@ os.makedirs(SUBMISSION_PATH, exist_ok=True)
 
 # Hyper paramètres
 batch_size = 32
-epochs = 30
-learning_rate = 0.001
+epochs = 15
+learning_rate = 0.00005
+weight_decay = 0.0001
 
 # create device based on GPU availability
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -37,6 +38,7 @@ transform = transforms.Compose([
     #    mean=[0.485, 0.456, 0.406],
     #    std=[0.229, 0.224, 0.225]
     #)
+    transforms.RandomHorizontalFlip(p = 0.5),
     transforms.Normalize(
         mean=[0.485, 0.456, 0.406, 0.5],
         std=[0.229, 0.224, 0.225, 0.5]
@@ -45,17 +47,16 @@ transform = transforms.Compose([
 
 
 # Seperate Dataset
-train_dataset = GeoLifeDataset(
+train_dataset = GeoLifeDataset2(
     DATA_PATH,
     subset = "train",
     transform=transform
 )
 
-val_dataset = GeoLifeDataset(
+val_dataset = GeoLifeDataset2(
     DATA_PATH,
     subset="val",
     transform=transform
-    #use_rasters=False
 )
 
 
@@ -64,21 +65,15 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=batch_size,
     shuffle=True,
-    #num_workers=4
 )
 
 val_loader = torch.utils.data.DataLoader(
     val_dataset,
     batch_size=batch_size,
     shuffle=False,
-    #num_workers=4
 )
 
-#all_labels = [train_dataset[i][1] for i in range(len(train_dataset))]
-#unique_species = sorted(set(all_labels))
 
-#species_to_index = {s: i for i, s in enumerate(unique_species)}
-#num_classes = len(unique_species)
 num_classes = len(train_dataset.label_map)
 
 # Create CNN model
@@ -111,12 +106,13 @@ def validate(model, val_loader, loss_fn, device):
 
     with torch.no_grad():
 
-        for images, labels in val_loader:
+        for images, coords, labels in val_loader:
 
             images = images.to(device)
+            coords = coords.to(device)
             labels = labels.to(device)
 
-            outputs = model(images)
+            outputs = model(images,coords)
 
             loss_value = loss_fn(outputs, labels)
             val_loss += loss_value.item()
@@ -149,14 +145,15 @@ for epoch in range(epochs):
     correct_top30 = 0
     total = 0
 
-    for images, labels in tqdm(train_loader):
+    for images, coords, labels in tqdm(train_loader):
 
         images = images.to(device)
+        coords = coords.to(device)
         labels = labels.to(device)
 
         optimizer.zero_grad()
 
-        outputs = model(images)
+        outputs = model(images, coords)
 
         loss_value = loss(outputs, labels)
         loss_value.backward()
@@ -201,6 +198,9 @@ for epoch in range(epochs):
     print(f"Val Accuracy: {val_accuracy:.4f}")
     print(f"Val Top-30 Error: {val_top30_error:.4f}")
 
+torch.save(model.state_dict(), "cnn_model_final_2021.pth")
+print("Model saved!")
+
 # Sauvegarder les scores
 results = pd.DataFrame({
     "epoch": range(1, epochs+1),
@@ -213,7 +213,7 @@ results = pd.DataFrame({
 })
 
 
-results.to_csv(SUBMISSION_PATH / "training_scores.csv", index=False)
+results.to_csv(SUBMISSION_PATH / "training_scores_final_2021.csv", index=False)
 print("Scores saved!")
 
 import matplotlib.pyplot as plt
@@ -227,6 +227,7 @@ plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.title("Training vs Validation Loss")
 plt.legend()
+plt.savefig(SUBMISSION_PATH / "training_curves_final_2021.png")
 plt.show()
 
 
@@ -239,5 +240,5 @@ plt.ylabel("Accuracy")
 plt.title("Validation Accuracy over Epochs")
 plt.legend()
 plt.show()
-plt.savefig(SUBMISSION_PATH / "training_curves.png")
+plt.savefig(SUBMISSION_PATH / "accuracy_curve_final_2021.png")
 print("Graph saved!")
