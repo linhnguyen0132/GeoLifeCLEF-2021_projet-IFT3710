@@ -96,10 +96,10 @@ class GeoLifeDataset2(Dataset):
         coords = torch.tensor([
             lat/90,
             lon/180,
-            np.sin(np.radians(lat)),
-            np.cos(np.radians(lat)),
-            np.sin(np.radians(lon)),
-            np.cos(np.radians(lon))
+            #np.sin(np.radians(lat)),
+            #np.cos(np.radians(lat)),
+            #np.sin(np.radians(lon)),
+            #np.cos(np.radians(lon))
         ], dtype=torch.float32)
 
         label = self.label_map[species]
